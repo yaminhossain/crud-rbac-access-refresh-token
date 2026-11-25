@@ -36,7 +36,7 @@ const initDB = async () => {
         updated_at TIMESTAMP DEFAULT NOW()
       );
 
-      INSERT INTO roles(name) VALUES ('user'), ('admin')
+      INSERT INTO roles(name) VALUES ('user'), ('admin'), ('guest')
       ON CONFLICT (name) DO NOTHING;
       
       INSERT INTO topics(name) VALUES ('Frontend'), ('Backend'), ('Database'), ('Security'), ('DevOps')
