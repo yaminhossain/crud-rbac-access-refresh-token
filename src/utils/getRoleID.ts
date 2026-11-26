@@ -1,7 +1,9 @@
 import { pool } from "../db/initDB";
 import { Roles } from "../types/type";
 
-const getRoleID = async (role: Roles.ADMIN | Roles.GUEST | Roles.USER) => {
+const getRoleID = async (
+  role: Roles.ADMIN | Roles.GUEST | Roles.USER,
+): Promise<string> => {
   const result = await pool.query(`
       SELECT * FROM roles 
     `);
