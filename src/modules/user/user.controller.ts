@@ -19,4 +19,34 @@ const createUser = async (req: Request, res: Response) => {
   }
 };
 
-export const userController = { createUser };
+const getUser = async (req: Request, res: Response) => {
+  try {
+    let result;
+    if (req.params.id && typeof req.params.id === "string") {
+      const id = req.params.id;
+      result = await userServices.getUserFromDB(id);
+    } else {
+      res.status(400).send({
+        success: false,
+        message: "Invalid user id",
+      });
+    }
+
+    if (!result) {
+      res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).send({
+      success: true,
+      message: "User retrieved successfully",
+      data: result,
+    });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Something went wrong";
+    res.status(500).send({ success: false, message, error: err });
+  }
+};
+export const userController = { createUser, getUser };

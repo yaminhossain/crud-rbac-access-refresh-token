@@ -1,6 +1,7 @@
 import { pool } from "../../db/initDB";
-import { IncomingUser, Roles, User } from "../../types/type";
-import getRoleID from "../../utils/getRoleID";
+import { IncomingUser, Roles } from "../../types/type";
+import { findRole, getRoleID } from "../../utils/roleUtils";
+
 import bcrypt from "bcryptjs";
 
 const createUserIntoDB = async (payload: IncomingUser) => {
@@ -22,11 +23,26 @@ const createUserIntoDB = async (payload: IncomingUser) => {
     `,
     [name, email, hashedPassword, createdAt, roleId],
   );
-  
-
   return result.rows[0];
+};
+
+const getUserFromDB = async (id: string) => {
+  const result = await pool.query(
+    `
+      SELECT name, email, role_id, created_at FROM users
+      WHERE id = $1
+    `,
+    [id],
+  );
+
+  const roleName = await findRole(result.rows[0].role_id);
+  delete result.rows[0].role_id;
+  const user = { ...result.rows[0], role: roleName };
+
+  return user;
 };
 
 export const userServices = {
   createUserIntoDB,
+  getUserFromDB,
 };
