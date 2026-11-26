@@ -21,6 +21,10 @@ export interface User {
   createdAt?: string;
 }
 
+export type IncomingUser = Omit<User, "id" | "roleID"> & {
+  role?: Roles.ADMIN | Roles.GUEST | Roles.USER;
+};
+
 export interface Blog {
   id?: string;
   title: string;
