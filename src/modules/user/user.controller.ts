@@ -49,4 +49,52 @@ const getUser = async (req: Request, res: Response) => {
     res.status(500).send({ success: false, message, error: err });
   }
 };
-export const userController = { createUser, getUser };
+
+const getAllUser = async (req: Request, res: Response) => {
+  try {
+    const result = await userServices.getAllUserFromDB();
+    if (!result) {
+      res.status(404).send({
+        success: false,
+        message: "No user found",
+        data: [],
+      });
+    }
+    res.status(200).send({
+      success: true,
+      message: "User retrieved successfully",
+      data: result,
+    });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Something went wrong";
+    res.status(500).send({
+      success: false,
+      message,
+      error: err,
+    });
+  }
+};
+
+const updateUser = async (req: Request, res: Response) => {
+  try {
+    const result = await userServices.updateUserIntoDB({
+      ...req.body,
+      id: req.params.id,
+    });
+
+    res.status(200).send({
+      success: true,
+      message: "User Data Updated Successfully",
+      data: result,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Something went wrong";
+    res.status(500).send({
+      success: false,
+      message,
+      error: err,
+    });
+  }
+};
+
+export const userController = { createUser, getUser, getAllUser, updateUser };
