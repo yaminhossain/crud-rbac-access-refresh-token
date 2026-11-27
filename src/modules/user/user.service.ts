@@ -56,7 +56,7 @@ const getAllUserFromDB = async () => {
 const updateUserIntoDB = async (payload: Omit<User, "createAt" | "roleID">) => {
   const { id, name, email, password } = payload;
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  let hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
 
   //  id, name, email, role_id, created_at
   const result = await pool.query(
@@ -71,7 +71,20 @@ const updateUserIntoDB = async (payload: Omit<User, "createAt" | "roleID">) => {
     [name, email, hashedPassword, id],
   );
 
-  return result.rows[0]
+  return result.rows[0];
+};
+
+const deleteUserFromDB = async (id: string) => {
+  const result = await pool.query(
+    `
+      DELETE FROM users
+      WHERE id = $1
+      RETURNING name, email
+    `,
+    [id],
+  );
+
+  return result.rows[0];
 };
 
 export const userServices = {
@@ -79,4 +92,5 @@ export const userServices = {
   getUserFromDB,
   getAllUserFromDB,
   updateUserIntoDB,
+  deleteUserFromDB,
 };
