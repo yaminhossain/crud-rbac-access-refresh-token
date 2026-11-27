@@ -28,10 +28,12 @@ export type IncomingUser = Omit<User, "id" | "roleID"> & {
 export interface Blog {
   id?: string;
   title: string;
-  subTitle?: string;
+  sub_title?: string;
   content: string;
-  topicId?: string;
-  authorId: string;
-  createAt?: string;
-  updatedAt?: string;
+  topic_id?: string;
+  author_id: string;
+  create_at?: string;
+  updated_at?: string;
 }
+
+export type IncomingBlog = Omit<Blog, "id" | "createdAt" | "updatedAt">;

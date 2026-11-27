@@ -122,13 +122,14 @@ const deleteUser = async (req: Request, res: Response) => {
     });
     return;
   }
-  
+
   const result = await userServices.deleteUserFromDB(id);
   if (!result) {
     res.status(404).send({
       success: false,
       message: "User does not exist",
     });
+    return;
   }
 
   res.status(200).send({

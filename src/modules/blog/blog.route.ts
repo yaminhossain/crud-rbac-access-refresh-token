@@ -1,9 +1,8 @@
 import { Router } from "express";
+import { blogControllers } from "./blog.controller";
 
 const router = Router();
 
-router.get("/", (req, res) => {
-  res.send("Blog Router");
-});
+router.post("/", blogControllers.createBlog);
 
 export const blogRouter = router;
