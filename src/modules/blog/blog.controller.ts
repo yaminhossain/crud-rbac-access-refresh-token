@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { blogServices } from "./blog.service";
+import { validStingID } from "../../utils/helper";
 const createBlog = async (req: Request, res: Response) => {
   try {
     const result = await blogServices.createBlogIntoDB(req.body);
@@ -70,8 +71,44 @@ const getAllBlog = async (req: Request, res: Response) => {
     });
   }
 };
+
+const updateBlog = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    if (!validStingID(id)) {
+      res.status(500).send({
+        success: false,
+        message: "Invalid User ID",
+      });
+      return;
+    }
+    
+    const { title, sub_title, content, topic_id } = req.body;
+    const result = await blogServices.updateBlogIntoDB({
+      id,
+      title,
+      sub_title,
+      content,
+      topic_id,
+    });
+    res.status(200).send({
+      success: true,
+      message: "Blog Updated Successfully",
+      data: result,
+    });
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Something Went Wrong";
+    res.status(500).send({
+      success: false,
+      message,
+      error: e,
+    });
+  }
+};
+
 export const blogControllers = {
   createBlog,
   getBlog,
-  getAllBlog
+  getAllBlog,
+  updateBlog,
 };

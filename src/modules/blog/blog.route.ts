@@ -6,5 +6,6 @@ const router = Router();
 router.post("/", blogControllers.createBlog);
 router.get("/:id", blogControllers.getBlog);
 router.get("/", blogControllers.getAllBlog);
+router.patch("/:id", blogControllers.updateBlog);
 
 export const blogRouter = router;

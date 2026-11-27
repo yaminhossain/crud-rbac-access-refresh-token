@@ -1,5 +1,5 @@
 import { pool } from "../../db/initDB";
-import { IncomingBlog } from "../../types/type";
+import { Blog, IncomingBlog } from "../../types/type";
 
 const createBlogIntoDB = async (payload: IncomingBlog) => {
   const { title, sub_title, content, topic_id, author_id } = payload;
@@ -43,8 +43,31 @@ const getAllBlogsFromDB = async () => {
   return result.rows;
 };
 
+const updateBlogIntoDB = async (
+  payload: Pick<Blog, "id" | "title" | "sub_title" | "content" | "topic_id">,
+) => {
+  const { id, title, sub_title, content, topic_id } = payload;
+  const result = await pool.query(
+    `
+      UPDATE blogs
+      SET title = COALESCE($1,title),
+      sub_title = COALESCE($2,sub_title),
+      content = COALESCE($3,content),
+      topic_id = COALESCE($4,topic_id),
+      updated_at = NOW()
+      WHERE id = $5
+      RETURNING *
+    `,
+    [title, sub_title, content, topic_id, id],
+  );
+
+  return result.rows[0];
+};
+
+
 export const blogServices = {
   createBlogIntoDB,
   getBlogFromDB,
   getAllBlogsFromDB,
+  updateBlogIntoDB,
 };
