@@ -39,6 +39,8 @@ const getBlog = async (req: Request, res: Response) => {
       return;
     }
     const result = await blogServices.getBlogFromDB(id);
+
+    console.log("Blog Data: ",result)
     res.status(200).send({
       success: true,
       message: "Blog retrieved successfully",
@@ -76,13 +78,13 @@ const updateBlog = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     if (!validStingID(id)) {
-      res.status(500).send({
+      res.status(404).send({
         success: false,
         message: "Invalid User ID",
       });
       return;
     }
-    
+
     const { title, sub_title, content, topic_id } = req.body;
     const result = await blogServices.updateBlogIntoDB({
       id,
@@ -106,9 +108,44 @@ const updateBlog = async (req: Request, res: Response) => {
   }
 };
 
+const deleteBlog = async (req: Request, res: Response) => {
+  try {
+    if (!validStingID(req.params.id)) {
+      res.status(404).send({
+        success: false,
+        message: "Invalid User ID",
+      });
+      return;
+    }
+
+    const result = await blogServices.deleteBlogFromDB(req.params.id);
+    if (!result) {
+      res.status(404).send({
+        success: false,
+        message: "Blog not found",
+        data: result,
+      });
+      return;
+    }
+    res.status(200).send({
+      success: true,
+      message: "Blog Deleted Successfully",
+      data: result,
+    });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Something Went Wrong";
+    res.status(500).send({
+      success: false,
+      message,
+      error: err,
+    });
+  }
+};
+
 export const blogControllers = {
   createBlog,
   getBlog,
   getAllBlog,
   updateBlog,
+  deleteBlog,
 };

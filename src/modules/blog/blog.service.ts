@@ -19,10 +19,18 @@ const createBlogIntoDB = async (payload: IncomingBlog) => {
 const getBlogFromDB = async (id: string) => {
   const result = await pool.query(
     `
-      SELECT b.id, b.title, b.sub_title, b.content, u.name AS author, t.name AS topic, b.created_at, b.updated_at
+      SELECT
+        b.id,
+        b.title,
+        b.sub_title,
+        b.content,
+        u.name AS author,
+        t.name AS topic,
+        b.created_at,
+        b.updated_at
       FROM blogs AS b
       JOIN users AS u ON u.id = b.author_id
-      JOIN topics AS t ON t.id = b.topic_id
+      LEFT JOIN topics AS t ON t.id = b.topic_id
       WHERE b.id = $1
     `,
     [id],
@@ -30,7 +38,6 @@ const getBlogFromDB = async (id: string) => {
 
   return result.rows[0];
 };
-
 const getAllBlogsFromDB = async () => {
   const result = await pool.query(`
     SELECT b.id, b.title, b.sub_title, b.content, u.name AS author, t.name AS topic, b.created_at, b.updated_at
@@ -64,10 +71,22 @@ const updateBlogIntoDB = async (
   return result.rows[0];
 };
 
+const deleteBlogFromDB = async (id: string) => {
+  const result = await pool.query(
+    `
+    DELETE FROM blogs
+    WHERE id = $1
+    RETURNING *
+    `,
+    [id],
+  );
 
+  return result.rows[0];
+};
 export const blogServices = {
   createBlogIntoDB,
   getBlogFromDB,
   getAllBlogsFromDB,
   updateBlogIntoDB,
+  deleteBlogFromDB,
 };
