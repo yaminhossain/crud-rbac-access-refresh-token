@@ -77,10 +77,26 @@ const getAllUser = async (req: Request, res: Response) => {
 
 const updateUser = async (req: Request, res: Response) => {
   try {
+    const id = req.params.id;
+    if (!id || typeof id !== "string") {
+      res.status(400).send({
+        success: false,
+        message: "Invalid User ID",
+      });
+      return;
+    }
     const result = await userServices.updateUserIntoDB({
       ...req.body,
-      id: req.params.id,
+      id,
     });
+
+    if (!result) {
+      res.status(404).send({
+        success: false,
+        message: "User Not Found",
+        data: result,
+      });
+    }
 
     res.status(200).send({
       success: true,
@@ -97,4 +113,34 @@ const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-export const userController = { createUser, getUser, getAllUser, updateUser };
+const deleteUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  if (!id || typeof id !== "string") {
+    res.status(400).send({
+      success: false,
+      message: "Invalid User ID",
+    });
+    return;
+  }
+  
+  const result = await userServices.deleteUserFromDB(id);
+  if (!result) {
+    res.status(404).send({
+      success: false,
+      message: "User does not exist",
+    });
+  }
+
+  res.status(200).send({
+    success: true,
+    message: "User Deleted Successfully",
+    data: result,
+  });
+};
+export const userController = {
+  createUser,
+  getUser,
+  getAllUser,
+  updateUser,
+  deleteUser,
+};
